@@ -1,0 +1,49 @@
+@model Models.Base.HomeModel
+@using TCAdmin.GameHosting.SDK.Objects;
+@{ 
+    var currentuser = TCAdmin.SDK.Web.Session.GetCurrentUser();
+}
+
+@if (currentuser.UserType == TCAdmin.SDK.Objects.UserType.User)
+{
+    var gameservices = Service.GetGameServices().Cast<Service>().ToList(); ;
+    var voiceservices = Service.GetVoiceServices().Cast<Service>().ToList(); ;
+    var tsservices = TeamSpeakService.GetTeamSpeakServices().Cast<TeamSpeakService>().ToList(); ;
+
+    if (gameservices.Count > 0)
+    {
+        if(gameservices.Count == 1)
+        {
+            Response.Redirect(string.Format("~/Service/Home/{0}", gameservices[0].ServiceId));
+        }
+        else
+        {
+            Response.Redirect("~/Interface/Game/GameServers");
+        }
+    }else if(voiceservices.Count > 0 & tsservices.Count == 0)
+    {
+        if (voiceservices.Count == 1)
+        {
+            Response.Redirect(string.Format("~/Service/Home/{0}", voiceservices[0].ServiceId));
+        }
+        else
+        {
+            Response.Redirect("~/Interface/Game/VoiceServers");
+        }
+
+    }else if(tsservices.Count > 0 & voiceservices.Count == 0)
+    {
+        if (tsservices.Count == 1)
+        {
+            Response.Redirect(string.Format("~/Interface/Game/TeamSpeakServiceHome?tsid={0}&port={1}", tsservices[0].TeamSpeakId, tsservices[0].Port));
+        }
+        else
+        {
+            Response.Redirect("~/Interface/Game/VoiceServers");
+        }
+    }
+    else if(voiceservices.Count > 0 & tsservices.Count > 0)
+    {
+        Response.Redirect("~/Interface/Game/VoiceServers");
+    }
+}
